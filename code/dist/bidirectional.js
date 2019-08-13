@@ -17,11 +17,11 @@ const aTL = T(self => bTL.sync(b => self.now = (self.now !== allTL.now - b)
 const bTL = T(self => aTL.sync(a => self.now = (self.now !== allTL.now - a)
     ? allTL.now - a
     : aTL.now = undefined));
-const dataTL = T(self => allThenResetTL([aTL, bTL]).sync(ab => (self.now = [...ab, allTL.now]) &&
-    console.info("a, b, all", self.now)));
 const allTL = T(self => self.sync(all => (dataTL.now === undefined)
     ? undefined
     : (a => b => aTL.now = all * (a / (a + b)))(dataTL.now[0])(dataTL.now[1])));
+const dataTL = T(self => allThenResetTL([aTL, bTL]).sync(ab => (self.now = [...ab, allTL.now]) &&
+    console.info("a, b, all", self.now)));
 const initTL = T(self => {
     world.now = dataTL;
     world.now = allTL;

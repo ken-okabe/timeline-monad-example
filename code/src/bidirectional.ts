@@ -28,12 +28,6 @@ const bTL = T(self =>
     )
 );
 
-const dataTL = T(self =>
-    allThenResetTL([aTL, bTL]).sync(ab =>
-        (self.now = [...ab, allTL.now]) &&
-        console.info("a, b, all", self.now))
-);
-
 const allTL = T(self =>
     self.sync(all =>
         (dataTL.now === undefined)
@@ -42,6 +36,12 @@ const allTL = T(self =>
                 aTL.now = all * (a / (a + b))
             )(dataTL.now[0])(dataTL.now[1])
     )
+);
+
+const dataTL = T(self =>
+    allThenResetTL([aTL, bTL]).sync(ab =>
+        (self.now = [...ab, allTL.now]) &&
+        console.info("a, b, all", self.now))
 );
 
 const initTL = T(self => {
