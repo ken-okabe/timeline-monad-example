@@ -1,0 +1,27 @@
+{
+  "name": "timeline-monad-example",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "module": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stken2050/timeline-monad-example.git"
+  },
+  "author": "Ken Okabe",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stken2050/timeline-monad-example/issues"
+  },
+  "homepage": "https://github.com/stken2050/timeline-monad-example#readme",
+  "dependencies": {
+    "timeline-monad": "*"
+  },
+  "devDependencies": {
+    "esm": "*",
+    "typescript": "*"
+  }
+}
