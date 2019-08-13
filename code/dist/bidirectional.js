@@ -1,25 +1,26 @@
+/*
+Circlar(bidirectional) dependency
+
+width@A = width@ALL - width@B
+width@B = width@ALL - width@A
+width@ALL = 500px
+
+The whole elements are automatically set
+  according to the changes of each elements
+*/
 import { T, world } from "../../node_modules/timeline-monad/code/dist/timeline-monad.js";
 import { allThenResetTL } from "../..//node_modules/timeline-monad/code/dist/allThenResetTL.js";
-/*
-「Aの幅」= 「全体の幅」-「Bの幅」
-「Bの幅」= 「全体の幅」-「Aの幅」
-「全体の幅」= 500ピクセル
-という式の場合は、「Aの幅」と「Bの幅」を両方満たすような解が存在します
-ユーザーが画面上のウィジェットを操作して
-「Aの幅」あるいは
-「Bの幅」を変えたときに、もうひとつの「幅」も正しく計算されます。
-また、「全体の幅」が変わったときにも、
-「Aの幅」や「Bの幅」も良いように変更され、制約が保たれるようになります。
-*/
 const aTL = T(self => bTL.sync(b => self.now = (self.now !== allTL.now - b)
     ? allTL.now - b
-    : bTL.now = undefined));
+    : bTL.now = undefined //aTL.now = bTL.now = undefined
+));
 const bTL = T(self => aTL.sync(a => self.now = (self.now !== allTL.now - a)
     ? allTL.now - a
-    : aTL.now = undefined));
-const allTL = T(self => self.sync(all => (dataTL.now === undefined)
+    : aTL.now = undefined //bTL.now = aTL.now = undefined
+));
+const allTL = T(self => self.sync(all => aTL.now = (dataTL.now === undefined) //bTL.now=..is also fine
     ? undefined
-    : (a => b => aTL.now = all * (a / (a + b)))(dataTL.now[0])(dataTL.now[1])));
+    : (a => b => all * (a / (a + b)))(dataTL.now[0])(dataTL.now[1])));
 const dataTL = T(self => allThenResetTL([aTL, bTL]).sync(ab => (self.now = [...ab, allTL.now]) &&
     console.info("a, b, all", self.now)));
 const initTL = T(self => {
