@@ -10,24 +10,8 @@ The whole elements are automatically set
 */
 import { T, world } from "../../node_modules/timeline-monad/code/dist/timeline-monad.js";
 import { allThenResetTL } from "../..//node_modules/timeline-monad/code/dist/allThenResetTL.js";
-const aTL = T(self => bTL.sync(b => // aTL depends on bTL
- self.now = (self.now !== allTL.now - b) //if not fixed-point
-    ? allTL.now - b //update aTL
-    : bTL.now = undefined //aTL.now = bTL.now = undefined
-));
-const bTL = T(self => aTL.sync(a => // bTL depends on aTL
- self.now = (self.now !== allTL.now - a) //if not fixed-point
-    ? allTL.now - a //update bTL
-    : aTL.now = undefined //bTL.now = aTL.now = undefined
-));
-const allTL = T(self => self.sync(all => // on allTL change
- aTL.now = (dataTL.now === undefined) //bTL.now=..is also fine
-    ? undefined
-    : (a => b => all * (a / (a + b))) //keep ratio of a,b
-    (dataTL.now[0])(dataTL.now[1])));
-const dataTL = T(self => //data is atomic update of aTL & bTL
- allThenResetTL([aTL, bTL]).sync(ab => (self.now = [...ab, allTL.now]) &&
-    console.info("a, b, all", self.now)));
+const start = () => (world.now = initTL);
+setTimeout(start, 0); // data connect to the real world 
 const initTL = T(self => {
     world.now = dataTL;
     world.now = allTL;
@@ -49,4 +33,21 @@ const initTL = T(self => {
     setTimeout(f0, 80); //widh 500
     setTimeout(f2, 90);
 });
-world.now = initTL; // data connect to the real world
+const aTL = T(self => bTL.sync(b => // aTL depends on bTL
+ self.now = (self.now !== allTL.now - b) //if not fixed-point
+    ? allTL.now - b //update aTL
+    : bTL.now = undefined //aTL.now = bTL.now = undefined
+));
+const bTL = T(self => aTL.sync(a => // bTL depends on aTL
+ self.now = (self.now !== allTL.now - a) //if not fixed-point
+    ? allTL.now - a //update bTL
+    : aTL.now = undefined //bTL.now = aTL.now = undefined
+));
+const allTL = T(self => self.sync(all => // on allTL change
+ aTL.now = (dataTL.now === undefined) //bTL.now=..is also fine
+    ? undefined
+    : (a => b => all * (a / (a + b))) //keep ratio of a,b
+    (dataTL.now[0])(dataTL.now[1])));
+const dataTL = T(self => //data is atomic update of aTL & bTL
+ allThenResetTL([aTL, bTL]).sync(ab => (self.now = [...ab, allTL.now]) &&
+    console.log("a, b, all: " + self.now)));
